@@ -23,7 +23,7 @@ import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputMaskModule } from 'primeng/inputmask';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { EntityResponse } from '@interfaces/entity';
@@ -45,7 +45,7 @@ import { AuthoritiesService } from '@auth/services/authorities.service';
     DialogModule,
     SelectModule,
     InputTextModule,
-    InputMaskModule,
+    InputNumberModule,
     ConfirmDialogModule,
     ToastModule,
     FormErrorComponent,
@@ -126,7 +126,7 @@ export class EntityComponent implements OnInit {
         ) || null,
       taxpayerType:
         this.optionTaxpayers.find(
-          (tp) => tp.idTaxpayerType === entity.taxpayerType.idTaxpayerType
+          (tp) => tp.idTaxpayerType === entity.taxpayerType?.idTaxpayerType
         ) || null,
       state:
         this.stateOptions.find((state) => state.value === entity.state) || null,
@@ -135,36 +135,21 @@ export class EntityComponent implements OnInit {
 
   buildEntity() {
     this.entityUpdateForm = this.formBuilder.group({
-      numDocument: [{ value: '', disabled: true }, [Validators.required]],
+      numDocument: ['', [Validators.required, Validators.maxLength(25)]],
       companyName: [
         '',
         [
           Validators.required,
-          Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/),
           Validators.minLength(3),
           Validators.maxLength(100),
         ],
       ],
-      tradeName: [
-        '',
-        [
-          Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/),
-          Validators.maxLength(100),
-        ],
-      ],
-      address: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/),
-          Validators.minLength(3),
-          Validators.maxLength(100),
-        ],
-      ],
-      phone: ['', [Validators.required]],
+      tradeName: ['', [Validators.maxLength(100)]],
+      address: ['', [Validators.maxLength(250)]],
+      phone: [null, [Validators.maxLength(15)]],
       state: ['', [Validators.required]],
       documentType: ['', [Validators.required]],
-      taxpayerType: ['', [Validators.required]],
+      taxpayerType: [null],
     });
   }
 
@@ -189,7 +174,7 @@ export class EntityComponent implements OnInit {
         address: address,
         phone: phone,
         state: state.value,
-        taxpayerType: taxpayerType.idTaxpayerType,
+        taxpayerType:taxpayerType?.idTaxpayerType ||  null,
         documentType: documentType.idDocumentType,
       };
       this.entityService
@@ -200,7 +185,7 @@ export class EntityComponent implements OnInit {
               ...entityRequest,
               taxpayerType:
                 this.optionTaxpayers.find(
-                  (tax) => tax.idTaxpayerType === taxpayerType.idTaxpayerType
+                  (tax) => tax.idTaxpayerType === taxpayerType?.idTaxpayerType
                 ) || taxpayerType,
               documentType:
                 this.optionDocuments.find(

@@ -50,10 +50,7 @@ export class ModalDocumentTypeComponent implements OnInit {
 
   buildFormDocumentType() {
     this.documentTypeForm = this.formBuilder.group({
-      code: [
-        { value: '', disabled: true },
-        [Validators.required, Validators.maxLength(50)],
-      ],
+      code: ['', [Validators.required, Validators.maxLength(20)]],
       name: [
         '',
         [
@@ -97,20 +94,8 @@ export class ModalDocumentTypeComponent implements OnInit {
     }
   }
 
-  getNexNumber() {
-    this.documentTypeService.getNextNumber().subscribe({
-      next: (code: string) => {
-        this.documentTypeForm.get('code')?.setValue(code);
-      },
-      error: (error) => {
-        this.toastr.error(error.error.message, 'Error');
-      },
-    });
-  }
-
   openModalDocumentType() {
     this.modalDocumentType = true;
-    this.getNexNumber();
   }
 
   closeModalDocumentType() {

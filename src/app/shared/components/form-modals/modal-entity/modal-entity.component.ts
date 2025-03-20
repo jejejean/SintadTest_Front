@@ -13,17 +13,16 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputMaskModule } from 'primeng/inputmask';
 import { DocumentTypeService } from '@services/document-type.service';
 import { TaxpayerTypeService } from '@services/taxpayer-type.service';
 import { DocumentTypeByStateResponse } from '@interfaces/documentType';
 import { TaxpayerTypeInfoResponse } from '@interfaces/taxpayerType';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { forkJoin } from 'rxjs';
 import { SelectModule } from 'primeng/select';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { FormErrorComponent } from '../../form-errors/form-error.component';
 import { ToastrService } from 'ngx-toastr';
-
 @Component({
   selector: 'app-modal-entity',
   standalone: true,
@@ -34,7 +33,7 @@ import { ToastrService } from 'ngx-toastr';
     DividerModule,
     DialogModule,
     InputTextModule,
-    InputMaskModule,
+    InputNumberModule,
     SelectModule,
     KeyFilterModule,
     FormErrorComponent,
@@ -78,48 +77,22 @@ export class ModalEntityComponent implements OnInit {
     });
   }
 
-  getNexNumber() {
-    this.entityService.getNextNumber().subscribe({
-      next: (numDocument: string) => {
-        this.entityForm.get('numDocument')?.setValue(numDocument);
-      },
-      error: (error) => {
-        this.toastr.error(error.error.message, 'Error');
-      },
-    });
-  }
-
   buildFormEntity() {
     this.entityForm = this.formBuilder.group({
-      numDocument: [{ value: '', disabled: true }, [Validators.required]],
+      numDocument: ['', [Validators.required, Validators.maxLength(25)]],
       companyName: [
         '',
         [
           Validators.required,
-          Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/),
           Validators.minLength(3),
           Validators.maxLength(100),
         ],
       ],
-      tradeName: [
-        '',
-        [
-          Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/),
-          Validators.maxLength(100),
-        ],
-      ],
-      address: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/),
-          Validators.minLength(3),
-          Validators.maxLength(100),
-        ],
-      ],
-      phone: ['', [Validators.required]],
+      tradeName: ['', [Validators.maxLength(100)]],
+      address: ['', [Validators.maxLength(250)]],
+      phone: [null, [Validators.maxLength(11)]],
       documentType: ['', [Validators.required]],
-      taxpayerType: ['', [Validators.required]],
+      taxpayerType: [null],
     });
   }
 
@@ -143,7 +116,7 @@ export class ModalEntityComponent implements OnInit {
         address: address,
         phone: phone,
         state: true,
-        taxpayerType: taxpayerType.idTaxpayerType,
+        taxpayerType:taxpayerType?.idTaxpayerType ||  null,
         documentType: documentType.idDocumentType,
       };
       this.entityService.createEntity(entityRequest).subscribe({
@@ -153,7 +126,6 @@ export class ModalEntityComponent implements OnInit {
             'La Entidad ha sido creada exitosamente ',
             'Éxito'
           );
-          this.getNexNumber();
           this.closeModalEntity();
         },
         error: (error) => {
@@ -168,7 +140,6 @@ export class ModalEntityComponent implements OnInit {
 
   openModalEntity() {
     this.loadOptions();
-    this.getNexNumber();
   }
 
   closeModalEntity() {

@@ -18,14 +18,13 @@
 >
   <p-divider class="mt-0" />
   <form
-    class="grid md:col-span-2 gap-2 p-3"
+    class="grid md:col-span-2 gap-3 p-3"
     [formGroup]="entityForm"
     (ngSubmit)="onSubmitEntity()"
   >
     <div class="flex flex-col">
-      <label for="numDocument">Num Documento</label>
+      <label class="font-medium" for="numDocument">Num Documento</label>
       <input
-        fluid
         type="text"
         id="numDocument"
         pInputText
@@ -39,10 +38,13 @@
       <app-form-error
         [control]="entityForm.get('numDocument')"
         [validationMessage]="'El número de documento es requerido.'"
+        [maxMessage]="
+          'El número de documento no puede exceder los 25 caracteres'
+        "
       ></app-form-error>
     </div>
-    <div class="flex flex-col">
-      <label for="companyName">Razón Social</label>
+    <div class="flex flex-col col-span-2">
+      <label class="font-medium" for="companyName">Razón Social</label>
       <input
         fluid
         type="text"
@@ -58,15 +60,12 @@
       <app-form-error
         [control]="entityForm.get('companyName')"
         [validationMessage]="'La razón social es requerida.'"
-        [patternMessage]="
-          'La razón social solo puede contener letras y espacios'
-        "
         [minMessage]="'La razón social debe tener al menos 3 caracteres'"
         [maxMessage]="'La razón social no puede exceder los 100 caracteres'"
       ></app-form-error>
     </div>
-    <div class="flex flex-col">
-      <label for="tradeName">Nombre Comercial</label>
+    <div class="flex flex-col col-span-2">
+      <label class="font-medium" for="tradeName">Nombre Comercial</label>
       <input
         fluid
         type="text"
@@ -81,14 +80,11 @@
       />
       <app-form-error
         [control]="entityForm.get('tradeName')"
-        [patternMessage]="
-          'El nombre comercial solo puede contener letras y espacios'
-        "
         [maxMessage]="'El nombre comercial no puede exceder los 100 caracteres'"
       ></app-form-error>
     </div>
-    <div class="flex flex-col">
-      <label for="address">Ubicación</label>
+    <div class="flex flex-col col-span-2">
+      <label class="font-medium" for="address">Ubicación</label>
       <input
         fluid
         type="text"
@@ -103,20 +99,16 @@
       />
       <app-form-error
         [control]="entityForm.get('address')"
-        [validationMessage]="'La ubicación es requerida.'"
-        [patternMessage]="'La ubicación solo puede contener letras y espacios'"
-        [minMessage]="'La ubicación debe tener al menos 3 caracteres'"
-        [maxMessage]="'La ubicación no puede exceder los 100 caracteres'"
+        [maxMessage]="'La ubicación no puede exceder los 250 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="phone">Teléfono</label>
-      <p-inputmask
-        pKeyFilter="int"
-        styleClass="w-full"
-        id="phone"
-        mask="999 999 999"
+      <label class="font-medium" for="phone">Teléfono</label>
+      <p-inputnumber
+        mode="decimal"
+        inputId="phone"
         formControlName="phone"
+        [useGrouping]="false"
         [ngClass]="{
           'ng-invalid ng-dirty':
             entityForm.get('phone')?.touched && entityForm.get('phone')?.invalid
@@ -124,14 +116,15 @@
       />
       <app-form-error
         [control]="entityForm.get('phone')"
-        [validationMessage]="'El teléfono es requerido.'"
+        [maxMessage]="'El teléfono no puede exceder los 11 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="state">Tipo de Documento</label>
+      <label class="font-medium" for="documentType">Tipo de Documento</label>
       <p-select
+        fluid
         formControlName="documentType"
-        id="state"
+        id="documentType"
         [options]="optionDocuments"
         optionLabel="name"
         optionvalue="idDocumentType"
@@ -148,24 +141,18 @@
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="state">Tipo de Contribuyente</label>
+      <label class="font-medium" for="taxpayerType"
+        >Tipo de Contribuyente</label
+      >
       <p-select
+        fluid
         formControlName="taxpayerType"
-        id="state"
+        id="taxpayerType"
         [options]="optionTaxpayers"
         optionLabel="name"
         optionvalue="idTaxpayerType"
         [appendTo]="'body'"
-        [ngClass]="{
-          'ng-invalid ng-dirty':
-            entityForm.get('taxpayerType')?.touched &&
-            entityForm.get('taxpayerType')?.invalid
-        }"
       />
-      <app-form-error
-        [control]="entityForm.get('taxpayerType')"
-        [validationMessage]="'El tipo de contribuyente es requerido.'"
-      ></app-form-error>
     </div>
     <p-button
       label="GUARDAR"

@@ -99,10 +99,7 @@ export class DocumentTypeComponent implements OnInit {
 
   buildDocumentType() {
     this.documentTypeUpdateForm = this.formBuilder.group({
-      code: [
-        { value: '', disabled: true },
-        [Validators.required, Validators.maxLength(50)],
-      ],
+      code: ['', [Validators.required, Validators.maxLength(20)]],
       name: [
         '',
         [

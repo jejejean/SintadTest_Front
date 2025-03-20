@@ -40,9 +40,4 @@ export class EntityService {
     return this.httpClient.delete(url, { responseType: 'text' });
   }
 
-  getNextNumber(): Observable<string> {
-    const url = `${this.apiBaseUrl}/${ENTITY.GET_NEXT_NUMBER}`;
-    return this.httpClient.get(url, { responseType: 'text' });
-  }
-
 }

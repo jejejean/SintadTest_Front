@@ -23,7 +23,6 @@ export const DOCUMENT_TYPE ={
   UPDATE: `${DOCUMENT_TYPE_API_ENDPOINTS}/update-document-type`,
   DELETE: `${DOCUMENT_TYPE_API_ENDPOINTS}/delete-document-type`,
   GET_ALL_BY_STATE: `${DOCUMENT_TYPE_API_ENDPOINTS}/all-document-by-state`,
-  GET_NEXT_NUMBER: `${DOCUMENT_TYPE_API_ENDPOINTS}/next-number`,
 }
 
 export const TAXPAYER_TYPE = {
@@ -41,5 +40,4 @@ export const ENTITY = {
   CREATE: `${ENTITY_API_ENDPOINTS}/new-entity`,
   UPDATE: `${ENTITY_API_ENDPOINTS}/update-entity`,
   DELETE: `${ENTITY_API_ENDPOINTS}/delete-entity`,
-  GET_NEXT_NUMBER: `${ENTITY_API_ENDPOINTS}/next-number`,
 }

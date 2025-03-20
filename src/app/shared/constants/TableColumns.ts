@@ -13,6 +13,7 @@ export class TableColumns {
     { field: 'documentType', header: 'Documento' },
     { field: 'taxpayerType', header: 'Contribuyente' },
     { field: 'state', header: 'Estado' },
+    { field: 'actions', header: 'Acciones' },
   ];
 
   static readonly ColumnsDocumentType: Column[] = [

@@ -13,10 +13,9 @@
         <th *ngFor="let col of columns" scope="col">
           {{ col.header }}
         </th>
-        <th *ngIf="roles.includes('ADMINISTRADOR')" scope="col">Acciones</th>
       </tr>
     </ng-template>
-    <ng-template #body let-rowData let-columns="columns">
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
       <tr>
         <td *ngFor="let col of columns">
           <ng-container *ngIf="col.field === 'numDocument'">
@@ -26,10 +25,10 @@
           </ng-container>
 
           <ng-container *ngIf="col.field === 'taxpayerType'">
-            {{ rowData[col.field].name }}
+            {{ rowData[col.field]?.name }}
           </ng-container>
           <ng-container *ngIf="col.field === 'documentType'">
-            {{ rowData[col.field].name }}
+            {{ rowData[col.field]?.name || "" }}
           </ng-container>
 
           <ng-container *ngIf="col.field === 'state'">
@@ -48,25 +47,29 @@
               col.field !== 'numDocument' &&
               col.field !== 'state' &&
               col.field !== 'documentType' &&
-              col.field !== 'taxpayerType'
+              col.field !== 'taxpayerType' &&
+              col.field !== 'actions'
             "
           >
-            {{ rowData[col.field] }}
+            {{ rowData[col.field] || "" }}
           </ng-container>
-        </td>
-        <td class="flex gap-3" *ngIf="roles.includes('ADMINISTRADOR')">
-          <p-button
-            (click)="getEntityById(rowData.idEntity)"
-            icon="pi pi-pencil"
-            severity="secondary"
-            [rounded]="true"
-          ></p-button>
-          <p-button
-            (click)="modalDelete($event, rowData.idEntity)"
-            icon="pi pi-times"
-            severity="danger"
-            [rounded]="true"
-          ></p-button>
+          <div
+            class="flex flex-row justify-center gap-3 h-full"
+            *ngIf="roles.includes('ADMINISTRADOR') && col.field === 'actions'"
+          >
+            <p-button
+              (click)="getEntityById(rowData.idEntity)"
+              icon="pi pi-pencil"
+              severity="secondary"
+              [rounded]="true"
+            ></p-button>
+            <p-button
+              (click)="modalDelete($event, rowData.idEntity)"
+              icon="pi pi-times"
+              severity="danger"
+              [rounded]="true"
+            ></p-button>
+          </div>
         </td>
       </tr>
     </ng-template>
@@ -91,7 +94,7 @@
     (ngSubmit)="onUpdateEntity()"
   >
     <div class="flex flex-col">
-      <label for="numDocumentUp">Num Documento</label>
+      <label class="font-medium" for="numDocument">Num Documento</label>
       <input
         type="text"
         id="numDocument"
@@ -106,10 +109,13 @@
       <app-form-error
         [control]="entityUpdateForm.get('numDocument')"
         [validationMessage]="'El número de documento es requerido.'"
+        [maxMessage]="
+          'El número de documento no puede exceder los 25 caracteres'
+        "
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="companyName">Razón Social</label>
+      <label class="font-medium" for="companyName">Razón Social</label>
       <input
         type="text"
         id="companyName"
@@ -123,16 +129,13 @@
       />
       <app-form-error
         [control]="entityUpdateForm.get('companyName')"
-        [patternMessage]="
-          'La razón social solo puede contener letras y espacios'
-        "
         [validationMessage]="'La razón social es requerida.'"
         [minMessage]="'La razón social debe tener al menos 3 caracteres'"
         [maxMessage]="'La razón social no puede exceder los 100 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="tradeName">Nombre Comercial</label>
+      <label class="font-medium" for="tradeName">Nombre Comercial</label>
       <input
         type="text"
         id="tradeName"
@@ -146,14 +149,11 @@
       />
       <app-form-error
         [control]="entityUpdateForm.get('tradeName')"
-        [patternMessage]="
-          'El nombre comercial solo puede contener letras y espacios'
-        "
         [maxMessage]="'El nombre comercial no puede exceder los 100 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="address">Ubicación</label>
+      <label class="font-medium" for="address">Ubicación</label>
       <input
         type="text"
         id="address"
@@ -167,19 +167,16 @@
       />
       <app-form-error
         [control]="entityUpdateForm.get('address')"
-        [patternMessage]="'La ubicación solo puede contener letras y espacios'"
-        [validationMessage]="'La ubicación es requerida.'"
-        [minMessage]="'La ubicación debe tener al menos 3 caracteres'"
         [maxMessage]="'La ubicación no puede exceder los 100 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="phone">Teléfono</label>
-      <p-inputmask
-        styleClass="w-full"
-        id="phone"
-        mask="999 999 999"
+      <label class="font-medium" for="phone">Teléfono</label>
+      <p-inputnumber
+        mode="decimal"
+        inputId="phone"
         formControlName="phone"
+        [useGrouping]="false"
         [ngClass]="{
           'ng-invalid ng-dirty':
             entityUpdateForm.get('phone')?.touched &&
@@ -188,14 +185,14 @@
       />
       <app-form-error
         [control]="entityUpdateForm.get('phone')"
-        [validationMessage]="'El teléfono es requerido.'"
+        [maxMessage]="'El teléfono no puede exceder los 11 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="state">Tipo de Documento</label>
+      <label class="font-medium" for="documentType">Tipo de Documento</label>
       <p-select
         formControlName="documentType"
-        id="state"
+        id="documentType"
         [options]="optionDocuments"
         optionLabel="name"
         optionvalue="idDocumentType"
@@ -208,35 +205,28 @@
       />
       <app-form-error
         [control]="entityUpdateForm.get('documentType')"
-        [validationMessage]="'El tipo de documento es requerido.'"
+        [maxMessage]="'El teléfono no puede exceder los 11 caracteres'"
       ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="state">Tipo de Contribuyente</label>
+      <label class="font-medium" for="taxpayerType"
+        >Tipo de Contribuyente</label
+      >
       <p-select
         formControlName="taxpayerType"
-        id="state"
+        inputId="taxpayerType"
         [options]="optionTaxpayers"
         optionLabel="name"
         optionvalue="idTaxpayerType"
         [appendTo]="'body'"
-        [ngClass]="{
-          'ng-invalid ng-dirty':
-            entityUpdateForm.get('taxpayerType')?.touched &&
-            entityUpdateForm.get('taxpayerType')?.invalid
-        }"
       />
-      <app-form-error
-        [control]="entityUpdateForm.get('taxpayerType')"
-        [validationMessage]="'El tipo de contribuyente es requerido.'"
-      ></app-form-error>
     </div>
     <div class="flex flex-col">
-      <label for="state">Estado</label>
+      <label class="font-medium" for="state">Estado</label>
       <p-select
         fluid
         formControlName="state"
-        id="state"
+        inputId="state"
         [options]="stateOptions"
         optionLabel="name"
         optionvalue="value"

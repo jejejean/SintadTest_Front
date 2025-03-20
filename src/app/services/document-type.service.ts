@@ -54,8 +54,4 @@ export class DocumentTypeService {
     return this.httpClient.get<DocumentTypeByStateResponse[]>(url);
   }
 
-  getNextNumber(): Observable<string> {
-    const url = `${this.apiBaseUrl}/${DOCUMENT_TYPE.GET_NEXT_NUMBER}`;
-    return this.httpClient.get(url, { responseType: 'text' });
-  }
 }
