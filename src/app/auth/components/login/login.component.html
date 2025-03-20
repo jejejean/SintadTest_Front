@@ -1,0 +1,77 @@
+<div class="flex min-h-screen items-center justify-center">
+  <p-card styleClass="p-10 bg-gray-50">
+    <div class="flex flex-col items-center sm:mx-auto sm:w-full sm:max-w-sm">
+      <svg class="w-28 h-28 text-center" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <path
+          d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"
+        />
+      </svg>
+      <h2
+        class="mt-5 text-center text-2xl/9 font-bold tracking-tight text-gray-900"
+      >
+        Inicio de Sesión
+      </h2>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <form
+        class="grid gap-3"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmitLogin()"
+      >
+        <div>
+          <label
+            for="username"
+            class="block text-sm font-medium text-gray-900"
+            >Correo</label
+          >
+          <div>
+            <p-inputgroup>
+              <p-inputgroup-addon>
+                <i class="pi pi-envelope"></i>
+              </p-inputgroup-addon>
+              <input pInputText fluid formControlName="username" />
+            </p-inputgroup>
+          </div>
+          <app-form-error
+            [control]="loginForm.get('username')"
+            [validationMessage]="' Ingrese un usuario valido.'"
+          ></app-form-error>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-900"
+              >Contraseña</label
+            >
+          </div>
+          <div>
+            <p-password
+              fluid
+              formControlName="password"
+              [toggleMask]="true"
+              [feedback]="false"
+            />
+            <app-form-error
+              [control]="loginForm.get('username')"
+              [validationMessage]="' Ingrese una contraseña valida.'"
+            ></app-form-error>
+          </div>
+        </div>
+
+        <div>
+          <button
+            pButton
+            pRipple
+            fluid
+            type="submit"
+            label="Ingresar"
+            class="col-span-2 bg-[#0b3954] hover:bg-[#0b3954d8] border-[#0b3954]"
+          ></button>
+        </div>
+      </form>
+    </div>
+  </p-card>
+</div>

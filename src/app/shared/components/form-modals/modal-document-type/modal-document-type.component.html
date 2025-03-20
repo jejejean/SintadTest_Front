@@ -1,0 +1,91 @@
+<p-button
+  label="AGREGAR"
+  icon="pi pi-plus"
+  styleClass="bg-[#0b3954] hover:bg-[#0b3954de] border-[#0b3954] flex justify-star"
+  (click)="openModalDocumentType()"
+/>
+<p-dialog
+  [(visible)]="modalDocumentType"
+  [modal]="true"
+  [closable]="true"
+  closeOnEscape="false"
+  [style]="{ width: '35vw' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  draggable="false"
+  header="Registrar Documentos"
+  (onHide)="closeModalDocumentType()"
+>
+  <p-divider class="mt-0" />
+  <form
+    class="grid md:col-span-2 gap-2 p-3"
+    [formGroup]="documentTypeForm"
+    (ngSubmit)="onSubmitDocumentType()"
+  >
+    <div class="flex flex-col">
+      <label for="code">Código</label>
+      <input
+        type="text"
+        id="code"
+        pInputText
+        formControlName="code"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeForm.get('code')?.touched &&
+            documentTypeForm.get('code')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeForm.get('code')"
+        [maxMessage]="'El código no puede exceder los 50 caracteres'"
+        [patternMessage]="'El código solo puede contener letras y espacios'"
+        [validationMessage]="'El código es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="name">Nombre</label>
+      <input
+        type="text"
+        id="name"
+        pInputText
+        formControlName="name"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeForm.get('name')?.touched &&
+            documentTypeForm.get('name')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeForm.get('name')"
+        [minMessage]="'El nombre debe tener al menos 3 caracteres'"
+        [maxMessage]="'El nombre no puede exceder los 100 caracteres'"
+        [patternMessage]="'El nombre solo puede contener letras y espacios'"
+        [validationMessage]="'El nombre es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col md:col-span-2">
+      <label for="description">Descripción</label>
+      <input
+        type="text"
+        id="description"
+        pInputText
+        formControlName="description"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeForm.get('description')?.touched &&
+            documentTypeForm.get('description')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeForm.get('description')"
+        [maxMessage]="'La descripción debe tener como máximo 200 caracteres'"
+      ></app-form-error>
+    </div>
+    <p-button
+      label="GUARDAR"
+      type="submit"
+      icon="pi pi-save"
+      class="flex justify-center col-span-2"
+      styleClass=" col-span-2 bg-green-600 hover:bg-green-500 border-green-600"
+    />
+  </form>
+</p-dialog>

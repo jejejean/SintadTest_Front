@@ -1,0 +1,50 @@
+<p-button
+  label="AGREGAR"
+  icon="pi pi-plus"
+  styleClass="bg-[#0b3954] hover:bg-[#0b3954de] border-[#0b3954] flex justify-star"
+  (click)="openModalTaxpayerType()"
+/>
+<p-dialog
+  [(visible)]="modalTaxpayerType"
+  [modal]="true"
+  [closable]="true"
+  closeOnEscape="false"
+  [style]="{ width: '35vw' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  draggable="false"
+  header="Registrar Contribuyentes"
+  (onHide)="closeModalTaxpayerType()"
+>
+  <p-divider class="mt-0" />
+  <form [formGroup]="taxpayerTypeForm" (ngSubmit)="onSubmitTaxpayerType()">
+    <div class="flex flex-col">
+      <label for="name">Nombre</label>
+      <input
+        fluid
+        type="text"
+        id="name"
+        pInputText
+        formControlName="name"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            taxpayerTypeForm.get('name')?.touched &&
+            taxpayerTypeForm.get('name')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="taxpayerTypeForm.get('name')"
+        [minMessage]="'El nombre debe tener al menos 3 caracteres'"
+        [patternMessage]="'El nombre solo puede contener letras y espacios'"
+        [validationMessage]="'El nombre es requerido.'"
+      ></app-form-error>
+    </div>
+
+    <p-button
+      label="GUARDAR"
+      type="submit"
+      icon="pi pi-save"
+      class="flex justify-center my-3"
+      styleClass=" bg-green-600 hover:bg-green-500 border-green-600"
+    />
+  </form>
+</p-dialog>

@@ -1,0 +1,170 @@
+<p-toast />
+<p-confirmdialog />
+
+<p-card header="REGISTRO DE DOCUMENTOS" styleClass="my-10">
+  <app-modal-document-type
+    *ngIf="roles.includes('ADMINISTRADOR')"
+  ></app-modal-document-type>
+
+  <p-table
+    [columns]="cols"
+    [value]="documentTypes"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    styleClass="mt-5"
+  >
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th *ngFor="let col of columns" scope="col">
+          {{ col.header }}
+        </th>
+        <th *ngIf="roles.includes('ADMINISTRADOR')" scope="col">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-rowData let-columns="columns">
+      <tr>
+        <td *ngFor="let col of columns">
+          <!-- Campo 'code' -->
+          <ng-container *ngIf="col.field === 'code'">
+            <span class="bg-gray-200 p-2 rounded-md font-semibold">
+              {{ rowData[col.field] }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="col.field === 'state'">
+            <span
+              class="px-4 py-2 rounded-md text-white"
+              [ngClass]="{
+                'bg-green-500': rowData[col.field],
+                'bg-red-500': !rowData[col.field]
+              }"
+            >
+              {{ rowData[col.field] ? "Activo" : "Inactivo" }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="col.field !== 'code' && col.field !== 'state'">
+            {{ rowData[col.field] }}
+          </ng-container>
+        </td>
+        <td class="flex gap-3" *ngIf="roles.includes('ADMINISTRADOR')">
+          <p-button
+            (click)="getDocumentTypeById(rowData.idDocumentType)"
+            icon="pi pi-pencil"
+            severity="secondary"
+            [rounded]="true"
+          />
+          <p-button
+            (click)="modalDelete($event, rowData.idDocumentType)"
+            icon="pi pi-times"
+            severity="danger"
+            [rounded]="true"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-dialog
+  [(visible)]="modalDocumentType"
+  [modal]="true"
+  [closable]="true"
+  closeOnEscape="false"
+  [style]="{ width: '35vw' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  draggable="false"
+  header="Actualizar Documentos"
+>
+  <p-divider class="mt-0" />
+  <form
+    class="grid md:col-span-2 gap-2 p-3"
+    [formGroup]="documentTypeUpdateForm"
+    (ngSubmit)="onUpdateDocumentType()"
+  >
+    <div class="flex flex-col">
+      <label for="code">Código</label>
+      <input
+        type="text"
+        id="code"
+        pInputText
+        formControlName="code"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeUpdateForm.get('code')?.touched &&
+            documentTypeUpdateForm.get('code')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeUpdateForm.get('code')"
+        [maxMessage]="'El código no puede exceder los 50 caracteres'"
+        [validationMessage]="'El código es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="name">Nombre</label>
+      <input
+        type="text"
+        id="name"
+        pInputText
+        formControlName="name"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeUpdateForm.get('name')?.touched &&
+            documentTypeUpdateForm.get('name')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeUpdateForm.get('name')"
+        [minMessage]="'El nombre debe tener al menos 3 caracteres'"
+        [maxMessage]="'El nombre no puede exceder los 100 caracteres'"
+        [patternMessage]="'El nombre solo puede contener letras y espacios'"
+        [validationMessage]="'El nombre es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col md:col-span-2">
+      <label for="description">Descripción</label>
+      <input
+        type="text"
+        id="description"
+        pInputText
+        formControlName="description"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeUpdateForm.get('description')?.touched &&
+            documentTypeUpdateForm.get('description')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeUpdateForm.get('description')"
+        [maxMessage]="'La descripción debe tener como máximo 200 caracteres'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="state">Estado</label>
+      <p-select
+        formControlName="state"
+        id="state"
+        [options]="stateOptions"
+        optionLabel="name"
+        optionvalue="value"
+        [appendTo]="'body'"
+        [showClear]="true"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            documentTypeUpdateForm.get('state')?.touched &&
+            documentTypeUpdateForm.get('state')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="documentTypeUpdateForm.get('state')"
+        [validationMessage]="'El estado es requerido.'"
+      ></app-form-error>
+    </div>
+    <p-button
+      label="ACTUALIZAR"
+      type="submit"
+      class="flex justify-center col-span-2"
+      styleClass=" col-span-2 bg-green-600 hover:bg-green-500 border-green-600"
+    />
+  </form>
+</p-dialog>

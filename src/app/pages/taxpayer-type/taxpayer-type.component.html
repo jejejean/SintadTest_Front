@@ -1,0 +1,127 @@
+<p-toast />
+<p-confirmdialog />
+
+<p-card header="REGISTRO DE CONTRIBUYENTES" styleClass="my-10">
+  <app-modal-taxpayer-type
+    *ngIf="roles.includes('ADMINISTRADOR')"
+  ></app-modal-taxpayer-type>
+
+  <p-table
+    [columns]="cols"
+    [value]="taxpayerTypes"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    styleClass="mt-5"
+  >
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th *ngFor="let col of columns" scope="col">
+          {{ col.header }}
+        </th>
+        <th *ngIf="roles.includes('ADMINISTRADOR')" scope="col">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-rowData let-columns="columns">
+      <tr>
+        <td *ngFor="let col of columns">
+          <ng-container *ngIf="col.field === 'name'">
+            <span class="p-2">
+              {{ rowData[col.field] }}
+            </span>
+          </ng-container>
+          <ng-container *ngIf="col.field === 'state'">
+            <span
+              class="px-4 py-2 rounded-md text-white"
+              [ngClass]="{
+                'bg-green-500': rowData[col.field],
+                'bg-red-500': !rowData[col.field]
+              }"
+            >
+              {{ rowData[col.field] ? "Activo" : "Inactivo" }}
+            </span>
+          </ng-container>
+        </td>
+        <td class="flex gap-3" *ngIf="roles.includes('ADMINISTRADOR')">
+          <p-button
+            (click)="getTaxpayerTypeById(rowData.idTaxpayerType)"
+            icon="pi pi-pencil"
+            severity="secondary"
+            [rounded]="true"
+          />
+          <p-button
+            (click)="modalDelete($event, rowData.idTaxpayerType)"
+            icon="pi pi-times"
+            severity="danger"
+            [rounded]="true"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-dialog
+  [(visible)]="modalTaxpayerType"
+  [modal]="true"
+  [closable]="true"
+  closeOnEscape="false"
+  [style]="{ width: '35vw' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  draggable="false"
+  header="Actualizar Contribuyentes"
+>
+  <p-divider class="mt-0" />
+  <form
+    class="flex flex-col gap-2 p-3"
+    [formGroup]="taxpayerTypeUpdateForm"
+    (ngSubmit)="onUpdateTaxpayerType()"
+  >
+    <div class="flex flex-col">
+      <label for="name">Nombre</label>
+      <input
+        type="text"
+        id="name"
+        pInputText
+        formControlName="name"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            taxpayerTypeUpdateForm.get('name')?.touched &&
+            taxpayerTypeUpdateForm.get('name')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="taxpayerTypeUpdateForm.get('name')"
+        [minMessage]="'El nombre debe tener al menos 3 caracteres'"
+        [patternMessage]="'El nombre solo puede contener letras y espacios'"
+        [validationMessage]="'El nombre es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="state">Estado</label>
+      <p-select
+        fluid
+        formControlName="state"
+        id="state"
+        [options]="stateOptions"
+        optionLabel="name"
+        optionvalue="value"
+        [appendTo]="'body'"
+        [showClear]="true"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            taxpayerTypeUpdateForm.get('state')?.touched &&
+            taxpayerTypeUpdateForm.get('state')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="taxpayerTypeUpdateForm.get('state')"
+        [validationMessage]="'El estado es requerido'"
+      ></app-form-error>
+    </div>
+    <p-button
+      label="ACTUALIZAR"
+      type="submit"
+      class="flex justify-center col-span-2"
+      styleClass=" col-span-2 bg-green-600 hover:bg-green-500 border-green-600"
+    />
+  </form>
+</p-dialog>

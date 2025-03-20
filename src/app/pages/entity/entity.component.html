@@ -1,0 +1,263 @@
+<p-toast />
+<p-confirmdialog />
+<p-card header="REGISTRO DE ENTIDADES" styleClass="mt-10">
+  <app-modal-entity *ngIf="roles.includes('ADMINISTRADOR')"></app-modal-entity>
+
+  <p-table
+    [columns]="cols"
+    [value]="entities"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th *ngFor="let col of columns" scope="col">
+          {{ col.header }}
+        </th>
+        <th *ngIf="roles.includes('ADMINISTRADOR')" scope="col">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-rowData let-columns="columns">
+      <tr>
+        <td *ngFor="let col of columns">
+          <ng-container *ngIf="col.field === 'numDocument'">
+            <span class="bg-gray-200 p-2 rounded-md font-semibold">
+              {{ rowData[col.field] }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="col.field === 'taxpayerType'">
+            {{ rowData[col.field].name }}
+          </ng-container>
+          <ng-container *ngIf="col.field === 'documentType'">
+            {{ rowData[col.field].name }}
+          </ng-container>
+
+          <ng-container *ngIf="col.field === 'state'">
+            <span
+              class="px-4 py-2 rounded-md text-white"
+              [ngClass]="{
+                'bg-green-500': rowData[col.field],
+                'bg-red-500': !rowData[col.field]
+              }"
+            >
+              {{ rowData[col.field] ? "Activo" : "Inactivo" }}
+            </span>
+          </ng-container>
+          <ng-container
+            *ngIf="
+              col.field !== 'numDocument' &&
+              col.field !== 'state' &&
+              col.field !== 'documentType' &&
+              col.field !== 'taxpayerType'
+            "
+          >
+            {{ rowData[col.field] }}
+          </ng-container>
+        </td>
+        <td class="flex gap-3" *ngIf="roles.includes('ADMINISTRADOR')">
+          <p-button
+            (click)="getEntityById(rowData.idEntity)"
+            icon="pi pi-pencil"
+            severity="secondary"
+            [rounded]="true"
+          ></p-button>
+          <p-button
+            (click)="modalDelete($event, rowData.idEntity)"
+            icon="pi pi-times"
+            severity="danger"
+            [rounded]="true"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-dialog
+  [(visible)]="modalEntity"
+  [modal]="true"
+  [closable]="true"
+  closeOnEscape="false"
+  [style]="{ width: '35vw' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  draggable="false"
+  header="Registrar Documentos"
+  #modalForm
+>
+  <p-divider class="mt-0" />
+  <form
+    class="grid md:col-span-2 gap-2 p-3"
+    [formGroup]="entityUpdateForm"
+    (ngSubmit)="onUpdateEntity()"
+  >
+    <div class="flex flex-col">
+      <label for="numDocumentUp">Num Documento</label>
+      <input
+        type="text"
+        id="numDocument"
+        pInputText
+        formControlName="numDocument"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('numDocument')?.touched &&
+            entityUpdateForm.get('numDocument')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('numDocument')"
+        [validationMessage]="'El número de documento es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="companyName">Razón Social</label>
+      <input
+        type="text"
+        id="companyName"
+        pInputText
+        formControlName="companyName"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('companyName')?.touched &&
+            entityUpdateForm.get('companyName')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('companyName')"
+        [patternMessage]="
+          'La razón social solo puede contener letras y espacios'
+        "
+        [validationMessage]="'La razón social es requerida.'"
+        [minMessage]="'La razón social debe tener al menos 3 caracteres'"
+        [maxMessage]="'La razón social no puede exceder los 100 caracteres'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="tradeName">Nombre Comercial</label>
+      <input
+        type="text"
+        id="tradeName"
+        pInputText
+        formControlName="tradeName"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('tradeName')?.touched &&
+            entityUpdateForm.get('tradeName')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('tradeName')"
+        [patternMessage]="
+          'El nombre comercial solo puede contener letras y espacios'
+        "
+        [maxMessage]="'El nombre comercial no puede exceder los 100 caracteres'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="address">Ubicación</label>
+      <input
+        type="text"
+        id="address"
+        pInputText
+        formControlName="address"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('address')?.touched &&
+            entityUpdateForm.get('address')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('address')"
+        [patternMessage]="'La ubicación solo puede contener letras y espacios'"
+        [validationMessage]="'La ubicación es requerida.'"
+        [minMessage]="'La ubicación debe tener al menos 3 caracteres'"
+        [maxMessage]="'La ubicación no puede exceder los 100 caracteres'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="phone">Teléfono</label>
+      <p-inputmask
+        styleClass="w-full"
+        id="phone"
+        mask="999 999 999"
+        formControlName="phone"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('phone')?.touched &&
+            entityUpdateForm.get('phone')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('phone')"
+        [validationMessage]="'El teléfono es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="state">Tipo de Documento</label>
+      <p-select
+        formControlName="documentType"
+        id="state"
+        [options]="optionDocuments"
+        optionLabel="name"
+        optionvalue="idDocumentType"
+        [appendTo]="'body'"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('documentType')?.touched &&
+            entityUpdateForm.get('documentType')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('documentType')"
+        [validationMessage]="'El tipo de documento es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="state">Tipo de Contribuyente</label>
+      <p-select
+        formControlName="taxpayerType"
+        id="state"
+        [options]="optionTaxpayers"
+        optionLabel="name"
+        optionvalue="idTaxpayerType"
+        [appendTo]="'body'"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('taxpayerType')?.touched &&
+            entityUpdateForm.get('taxpayerType')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('taxpayerType')"
+        [validationMessage]="'El tipo de contribuyente es requerido.'"
+      ></app-form-error>
+    </div>
+    <div class="flex flex-col">
+      <label for="state">Estado</label>
+      <p-select
+        fluid
+        formControlName="state"
+        id="state"
+        [options]="stateOptions"
+        optionLabel="name"
+        optionvalue="value"
+        [appendTo]="'body'"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            entityUpdateForm.get('state')?.touched &&
+            entityUpdateForm.get('state')?.invalid
+        }"
+      />
+      <app-form-error
+        [control]="entityUpdateForm.get('state')"
+        [validationMessage]="'El tipo de contribuyente es requerido.'"
+      ></app-form-error>
+    </div>
+    <p-button
+      label="ACTUALIZAR"
+      type="submit"
+      icon="pi pi-save"
+      class="flex justify-center col-span-2"
+      styleClass=" col-span-2 bg-green-600 hover:bg-green-500 border-green-600"
+    />
+  </form>
+</p-dialog>
